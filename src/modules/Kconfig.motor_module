@@ -1,0 +1,22 @@
+#
+# Copyright (c) 2021 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig MOTOR_MODULE
+	bool "MOTOR module"
+	default y
+
+if MOTOR_MODULE
+
+config MOTOR_THREAD_STACK_SIZE
+	int "MOTOR module thread stack size"
+	default 1280
+
+
+endif # MOTOR_MODULE
+
+module = MOTOR_MODULE
+module-str = MOTOR module
+source "subsys/logging/Kconfig.template.log_config"
