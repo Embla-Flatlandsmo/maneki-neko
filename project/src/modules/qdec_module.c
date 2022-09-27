@@ -51,7 +51,7 @@ static bool app_event_handler(const struct app_event_header *aeh)
 	// 	return false;
 	// }
 	/* Event not handled but subscribed. */
-	__ASSERT_NO_MSG(false);
+	// __ASSERT_NO_MSG(false);
 
 	return false;
 }
@@ -155,4 +155,4 @@ K_THREAD_DEFINE(qdec_module_thread, CONFIG_QDEC_THREAD_STACK_SIZE,
 
 APP_EVENT_LISTENER(MODULE, app_event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, module_state_event);
-APP_EVENT_SUBSCRIBE(MODULE, button_event);
+// APP_EVENT_SUBSCRIBE(MODULE, button_event);

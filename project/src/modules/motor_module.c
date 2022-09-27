@@ -13,6 +13,8 @@
 #include <zephyr/sys/util.h>
 
 #include "events/qdec_module_event.h"
+#include <caf/events/button_event.h>
+#include <caf/events/click_event.h>
 
 #define MODULE motor_module
 
@@ -28,7 +30,13 @@ uint8_t motor_time_period_msec = 200;
 // 	// .msg_q = &msgq_data,
 // 	.supports_shutdown = true,
 // };
+#define BTN_INCREASE_PERIOD 0
+#define BTN_DECREASE_PERIOD 2
+#define BTN_INCREASE_AMP 1
+#define BTN_DECREASE_AMP 3
 
+#define AMPLITUDE_STEP 10
+#define PERIOD_STEP 10
 
 static int setup(void)
 {
@@ -50,6 +58,30 @@ uint8_t set_motor_time_period(uint8_t time_period_ms)
     return 0;
 }
 
+static bool handle_button_event(const struct button_event *evt)
+{
+	if (evt->pressed) {
+		switch (evt->key_id) {
+		case BTN_INCREASE_PERIOD:
+            LOG_DBG("increasing period");
+			break;
+		case BTN_DECREASE_PERIOD:
+            LOG_DBG("Decreasing period");
+			break;
+        case BTN_INCREASE_AMP:
+            LOG_DBG("Increasing amplitude");
+            break;
+        case BTN_DECREASE_AMP:
+            LOG_DBG("Decreasing Amplitude");
+            break;
+		default:
+			break;
+		}
+	}
+
+	return false;
+}
+
 static bool app_event_handler(const struct app_event_header *aeh)
 {
     if (is_qdec_module_event(aeh))
@@ -66,16 +98,23 @@ static bool app_event_handler(const struct app_event_header *aeh)
         }
         return false;
     }
+	if (is_button_event(aeh)) {
+		return handle_button_event(cast_button_event(aeh));
+	}
 
-	// if (is_module_state_event(aeh)) {
-	// 	const struct module_state_event *event = cast_module_state_event(aeh);
+	if (is_module_state_event(aeh)) {
+		// const struct module_state_event *event = cast_module_state_event(aeh);
 
-	// 	if (check_state(event, MODULE_ID(main), MODULE_STATE_READY)) {
-	// 		module_init();
-	// 	}
+		// if (check_state(event, MODULE_ID(main), MODULE_STATE_READY)) {
+		// 	module_init();
+		// }
 
-	// 	return false;
-	// }
+		return false;
+	}
+	/* Event not handled but subscribed. */
+	__ASSERT_NO_MSG(false);
+    return false;
+
 }
 
 static void module_thread_fn(void)
@@ -95,10 +134,10 @@ static void module_thread_fn(void)
 		// SEND_ERROR(data, DATA_EVT_ERROR, err);
 	}
 
-	while (true) {
-
-		k_sleep(K_MSEC(motor_time_period_msec));
-	}
+	// while (true) {
+    //     LOG_DBG("Setting motor (lol)");
+	// 	k_sleep(K_MSEC(motor_time_period_msec));
+	// }
 }
 
 K_THREAD_DEFINE(motor_module_thread, CONFIG_MOTOR_THREAD_STACK_SIZE,
@@ -107,3 +146,5 @@ K_THREAD_DEFINE(motor_module_thread, CONFIG_MOTOR_THREAD_STACK_SIZE,
 APP_EVENT_LISTENER(MODULE, app_event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, qdec_module_event);
 APP_EVENT_SUBSCRIBE(MODULE, module_state_event);
+APP_EVENT_SUBSCRIBE(MODULE, button_event);
+// APP_EVENT_SUBSCRIBE(MODULE, click_event);
