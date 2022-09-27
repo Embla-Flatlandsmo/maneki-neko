@@ -1,0 +1,38 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/ {
+	servo: servo {
+		compatible = "pwm-servo";
+        status="okay";
+		pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		min-pulse = <PWM_USEC(1500)>;
+		max-pulse = <PWM_USEC(2500)>;
+	};
+
+	qdecA: qdecA {
+		compatible = "nordic,qdec-gpio";
+		status = "okay";
+		label = "quadrature encoder A";
+		line-a-gpios = <&gpio0 10 0>;
+		line-b-gpios = <&gpio0 9 0>;
+		ticks-per-rotation = <1400>;
+	};
+
+	qdecB: qdecB {
+		compatible = "nordic,qdec-gpio";
+		status = "okay";
+		label = "quadrature encoder B";
+		line-a-gpios = <&gpio0 22 0>;
+		line-b-gpios = <&gpio0 23 0>;
+		ticks-per-rotation = <1400>;
+	};
+
+};
+
+&led0 {
+    status = "disabled";
+};
+
+&pwm_led0 {
+    status="disabled";
+};

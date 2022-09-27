@@ -5,18 +5,18 @@
 #
 
 menuconfig MOTOR_MODULE
-	bool "MOTOR module"
+	bool "Motor module"
 	default y
 
 if MOTOR_MODULE
 
 config MOTOR_THREAD_STACK_SIZE
-	int "MOTOR module thread stack size"
+	int "Motor module thread stack size"
 	default 1280
 
 
 endif # MOTOR_MODULE
 
 module = MOTOR_MODULE
-module-str = MOTOR module
+module-str = Motor module
 source "subsys/logging/Kconfig.template.log_config"
