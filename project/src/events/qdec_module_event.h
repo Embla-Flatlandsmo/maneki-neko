@@ -54,7 +54,7 @@ struct qdec_module_event {
 	enum qdec_module_event_type type;
 
 	union {
-		uint8_t rot_speed_val;
+		float rot_val;
 		/** Module ID, used when acknowledging shutdown requests. */
 		uint32_t id;
 		/** Code signifying the cause of error. */

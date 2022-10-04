@@ -65,12 +65,12 @@ static int qdec_gpio_channel_get(const struct device *dev, enum sensor_channel c
 
     int32_t counter = data->fetched_counter;
 
+    LOG_ERR("Counter: %d", counter);
     val->val1 = (counter * FULL_ANGLE) / steps;
 
     val->val2 = (counter * FULL_ANGLE) % steps;
     val->val2 *= 1000000;
     val->val2 /= steps;
-
     return 0;
 }
 
@@ -114,7 +114,6 @@ static void qdec_line_callback(const struct device *port, struct gpio_callback *
 
     data->prev_state_a = new_a;
     data->prev_state_b = new_b;
-
     uint8_t movement_index = (old_a << 3) + (old_b << 2) + (new_a << 1) + new_b;
     if (lookup_table[movement_index] > 1)
     {
@@ -138,7 +137,7 @@ static int init_gpio(const struct device *dev)
 {
     struct qdec_gpio_conf *conf = dev->config;
     int err;
-    err = gpio_pin_configure_dt(&conf->gpio_a, GPIO_INPUT | GPIO_INT_DEBOUNCE);
+    err = gpio_pin_configure_dt(&conf->gpio_a, GPIO_INPUT | GPIO_PULL_DOWN);
     err |= gpio_pin_interrupt_configure_dt(&conf->gpio_a, GPIO_INT_EDGE_BOTH);
     gpio_init_callback(&conf->gpio_a_cb_c.cb, qdec_line_callback, BIT(conf->gpio_a.pin));
     err |= gpio_add_callback(conf->gpio_a.port, &conf->gpio_a_cb_c.cb);
@@ -148,7 +147,7 @@ static int init_gpio(const struct device *dev)
         return err;
     }
 
-    err = gpio_pin_configure_dt(&conf->gpio_b, GPIO_INPUT | GPIO_INT_DEBOUNCE);
+    err = gpio_pin_configure_dt(&conf->gpio_b, GPIO_INPUT | GPIO_PULL_DOWN);
     err |= gpio_pin_interrupt_configure_dt(&conf->gpio_b, GPIO_INT_EDGE_BOTH);
     gpio_init_callback(&conf->gpio_b_cb_c.cb, qdec_line_callback, BIT(conf->gpio_b.pin));
     err |= gpio_add_callback(conf->gpio_b.port, &conf->gpio_b_cb_c.cb);
@@ -168,7 +167,6 @@ static const struct sensor_driver_api qdec_gpio_driver_api = {
 
 static int init_qdec_gpio(const struct device *dev)
 {
-
     struct qdec_gpio_conf *conf = dev->config;
     struct qdec_gpio_data *data = dev->data;
     int err;

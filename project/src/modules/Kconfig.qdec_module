@@ -1,6 +1,7 @@
 menuconfig QDEC_MODULE
 	bool "Quadrature decoder module"
 	default y
+	depends on QDEC_GPIO
 
 if QDEC_MODULE
 

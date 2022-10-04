@@ -15,23 +15,14 @@
 #include "modules_common.h"
 #include "events/qdec_module_event.h"
 
-
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(MODULE, CONFIG_QDEC_MODULE_LOG_LEVEL);
 
-static struct device *qdeca_dev;
-static struct device *qdecb_dev;
+// static struct device *qdeca_dev;
+// static struct device *qdecb_dev;
 
-static struct sensor_trigger trig_a;
-static struct sensor_trigger trig_b;
-
-static void trigger_handler(const struct device *dev,
-			    const struct sensor_trigger *trig)
-{
-	// struct sensor_value tmp;
-	// int rc;
-	// rc = sensor_sample
-}
+// static struct sensor_trigger trig_a;
+// static struct sensor_trigger trig_b;
 
 static struct module_data self = {
 	.name = "qdec",
@@ -64,55 +55,75 @@ static bool app_event_handler(const struct app_event_header *aeh)
 	// 						 SENSOR_ATTR_LOWER_THRESH, &val);
 // }
 
-static void trigger_a_handler(const struct device *dev, const struct sensor_trigger trig)
-{
-	struct sensor_value rot;
-	int err;
-	err = sensor_sample_fetch(dev);
-	if (err != 0)
-	{
-		printf("sensor_sample_fetch error: %d\n", err);
-		return;
-	}
-	err = sensor_channel_get(dev, SENSOR_CHAN_ROTATION, &rot);
-	if (err != 0)
-	{
-		printf("sensor_channel_get error: %d\n", err);
-		return;
-	}
-	struct qdec_module_event *qdec_module_event = new_qdec_module_event();
-	qdec_module_event->type = QDEC_A_EVT_DATA_SEND;
-	qdec_module_event->data.rot_speed_val = sensor_value_to_double(&rot);
-	APP_EVENT_SUBMIT(qdec_module_event);
-}
+// static void trigger_a_handler(const struct device *dev, const struct sensor_trigger* trig)
+// {
+// 	struct sensor_value rot;
+// 	int err;
+// 	err = sensor_sample_fetch(dev);
+// 	if (err != 0)
+// 	{
+// 		LOG_ERR("sensor_sample_fetch error: %d\n", err);
+// 		return;
+// 	}
+// 	err = sensor_channel_get(dev, SENSOR_CHAN_ROTATION, &rot);
+// 	if (err != 0)
+// 	{
+// 		LOG_ERR("sensor_channel_get error: %d\n", err);
+// 		return;
+// 	}
+// 	struct qdec_module_event *qdec_module_event = new_qdec_module_event();
+// 	qdec_module_event->type = QDEC_A_EVT_DATA_SEND;
+// 	qdec_module_event->data.rot_val = sensor_value_to_double(&rot);
+// 	APP_EVENT_SUBMIT(qdec_module_event);
+// }
 
-static void trigger_b_handler(const struct device *dev, const struct sensor_trigger trig)
-{
-}
+// static void trigger_b_handler(const struct device *dev, const struct sensor_trigger* trig)
+// {
+// 		struct sensor_value rot;
+// 	int err;
+// 	err = sensor_sample_fetch(dev);
+// 	if (err != 0)
+// 	{
+// 		LOG_ERR("sensor_sample_fetch error: %d\n", err);
+// 		return;
+// 	}
+// 	err = sensor_channel_get(dev, SENSOR_CHAN_ROTATION, &rot);
+// 	if (err != 0)
+// 	{
+// 		LOG_ERR("sensor_channel_get error: %d\n", err);
+// 		return;
+// 	}
+// 	struct qdec_module_event *qdec_module_event = new_qdec_module_event();
+// 	qdec_module_event->type = QDEC_B_EVT_DATA_SEND;
+// 	qdec_module_event->data.rot_val = sensor_value_to_double(&rot);
+// 	APP_EVENT_SUBMIT(qdec_module_event);
+// }
 
 static int setup(void)
 {
-	qdeca_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdeca)));
-	qdecb_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdecb)));
-	if (qdeca_dev == NULL || qdecb_dev == NULL)
-	{
-		LOG_ERR("Failed to get bindings for qdec devices");
-		return -ENODEV;
-	}
+	// const struct device* qdeca_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdeca)));
+	// const struct device* qdecb_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdecb)));
+	// if (qdeca_dev == NULL || qdecb_dev == NULL)
+	// {
+	// 	LOG_ERR("Failed to get bindings for qdec devices");
+	// 	return -ENODEV;
+	// }
 
-	trig_a.type = SENSOR_TRIG_DATA_READY;
-	trig_a.chan = SENSOR_CHAN_ROTATION;
-	trig_b.type = SENSOR_TRIG_DATA_READY;
-	trig_b.chan = SENSOR_CHAN_ROTATION;
-	int err;
-	// err = sensor_trigger_set(qdeca_dev, trig_a, trigger_a_handler);
+	// trig_a.type = SENSOR_TRIG_DATA_READY;
+	// trig_a.chan = SENSOR_CHAN_ROTATION;
+
+	// trig_b.type = SENSOR_TRIG_DATA_READY;
+	// trig_b.chan = SENSOR_CHAN_ROTATION;
+	// int err;
+	// err = sensor_trigger_set(qdeca_dev, &trig_a, trigger_a_handler);
 	// if (err)
 	// {
 	// 	LOG_ERR("sensor_trigger_set for qdecb error: %d", err);
 	// 	return err;
 	// }
 
-	// err = sensor_trigger_set(qdecb_dev, trig_b, trigger_b_handler);
+	// err = sensor_trigger_set(qdecb_dev, &trig_b, trigger_b_handler);
+	// if (err)
 	// {
 	// 	LOG_ERR("sensor_trigger_set for qdecb error: %d", err);
 	// 	return err;
@@ -123,6 +134,7 @@ static int setup(void)
 
 static void module_thread_fn(void)
 {
+	LOG_DBG("QDEC module started.");
 	int err;
 
 	self.thread_id = k_current_get();
@@ -133,20 +145,46 @@ static void module_thread_fn(void)
 		SEND_ERROR(qdec, QDEC_EVT_ERROR, err);
 	}
 
-	// err = setup();
-	// if (err) {
-	// 	LOG_ERR("setup, error: %d", err);
-	// 	SEND_ERROR(qdec, QDEC_EVT_ERROR, err);
-	// }
-    uint8_t simulated_val = 0;
-	while (true) {
-        simulated_val += 10;
-		struct qdec_module_event *qdec_module_event = new_qdec_module_event();
-		qdec_module_event->type = QDEC_A_EVT_DATA_SEND;
-		qdec_module_event->data.rot_speed_val = simulated_val;
-        APP_EVENT_SUBMIT(qdec_module_event);
-        k_sleep(K_MSEC(500));
+	const struct device* qdeca_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdeca)));
+	// const struct device* qdeca_dev = device_get_binding("hello");
+	const struct device* qdecb_dev = device_get_binding(DT_LABEL(DT_NODELABEL(qdecb)));
+	if (qdeca_dev == NULL || qdecb_dev == NULL)
+	{
+		LOG_ERR("Failed to get bindings for qdec devices");
+		// return -ENODEV;
 	}
+
+	err = setup();
+	if (err) {
+		LOG_ERR("setup, error: %d", err);
+		SEND_ERROR(qdec, QDEC_EVT_ERROR, err);
+	}
+
+	int rc;
+	while(true)
+	{
+		struct sensor_value rot;
+		rc = sensor_sample_fetch(qdeca_dev);
+		if (rc != 0) {
+			LOG_ERR("sensor_sample_fetch error: %d", rc);
+			break;
+		}
+		rc = sensor_channel_get(qdeca_dev, SENSOR_CHAN_ROTATION, &rot);
+		if (rc != 0) {
+			LOG_ERR("sensor_channel_get error: %d", rc);
+		}
+		// LOG_DBG("qdeca rotation: %f", (float)sensor_value_to_double(&rot));
+	}
+
+    // uint8_t simulated_val = 0;
+	// while (true) {
+    //     simulated_val += 10;
+	// 	struct qdec_module_event *qdec_module_event = new_qdec_module_event();
+	// 	qdec_module_event->type = QDEC_A_EVT_DATA_SEND;
+	// 	qdec_module_event->data.rot_val = simulated_val;
+    //     APP_EVENT_SUBMIT(qdec_module_event);
+    //     k_sleep(K_MSEC(500));
+	// }
 }
 
 K_THREAD_DEFINE(qdec_module_thread, CONFIG_QDEC_THREAD_STACK_SIZE,

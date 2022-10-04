@@ -1,7 +1,7 @@
 menu "GPIO quadrature decoder"
 config QDEC_GPIO
     bool "Enable gpio quadrature decoder"
-    depends on GPIO
+    depends on GPIO && SENSOR
 endmenu
 
 module = QDEC_GPIO_DRIVER

@@ -172,6 +172,7 @@ static bool app_event_handler(const struct app_event_header *aeh)
 
 static void module_thread_fn(void)
 {
+    LOG_DBG("Initializing motor module");
 	int err;
 	// self.thread_id = k_current_get();
 
@@ -188,14 +189,14 @@ static void module_thread_fn(void)
 	}
     int ret;
     static int up_or_down = 1;
-    
+
     while(true)
     {   
         uint32_t pulse_width_offset = map_range(amplitude, 0, 100, 0, pulse_range);
         uint32_t pulse_width = min_pulse+pulse_range+up_or_down*pulse_width_offset;
         up_or_down *= -1;
         ret = pwm_set_pulse_dt(&servo, pulse_width);
-		LOG_DBG("Setting servo %d\n", pulse_width);
+		// LOG_DBG("Setting servo %d\n", pulse_width);
 		if (ret < 0) {
 			LOG_ERR("Error %d: failed to set pulse width\n", ret);
 			return;
