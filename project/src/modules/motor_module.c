@@ -11,35 +11,54 @@
 #include <zephyr/types.h>
 
 #include <zephyr/sys/util.h>
+#include <device.h>
+#include <drivers/pwm.h>
 
 #include "events/qdec_module_event.h"
 #include <caf/events/button_event.h>
 #include <caf/events/click_event.h>
+#include <caf/events/module_state_event.h>
 
 #define MODULE motor_module
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(MODULE, CONFIG_MOTOR_MODULE_LOG_LEVEL);
 
-uint8_t motor_amplitude = 0;
-uint8_t motor_time_period_msec = 200;
+static const struct pwm_dt_spec servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
+static const uint32_t min_pulse = DT_PROP(DT_NODELABEL(servo), min_pulse);
+static const uint32_t max_pulse = DT_PROP(DT_NODELABEL(servo), max_pulse);
 
+static const uint32_t pulse_range = (max_pulse-min_pulse)/2;
 
-// static struct module_data self = {
-// 	.name = "motor",
-// 	// .msg_q = &msgq_data,
-// 	.supports_shutdown = true,
-// };
 #define BTN_INCREASE_PERIOD 0
 #define BTN_DECREASE_PERIOD 2
-#define BTN_INCREASE_AMP 1
-#define BTN_DECREASE_AMP 3
+#define BTN_INCREASE_PW 1
+#define BTN_DECREASE_PW 3
 
 #define AMPLITUDE_STEP 10
-#define PERIOD_STEP 10
+#define PERIOD_STEP 100
+
+#define MAX_PERIOD_MSEC 3000
+#define MIN_PERIOD_MSEC 200
+
+// uint32_t pulse_width = min_pulse;
+uint32_t amplitude = 0;
+uint32_t motor_time_period_msec = MIN_PERIOD_MSEC;
+
+uint32_t map_range(uint32_t input, uint32_t input_start, uint32_t input_end, uint32_t output_start, uint32_t output_end)
+{
+    return output_start + ((output_end - output_start) / (input_end - input_start)) * (input - input_start);
+}
+
 
 static int setup(void)
 {
+	int ret;
+
+	if (!device_is_ready(servo.dev)) {
+		LOG_ERR("Error: PWM device %s is not ready\n", servo.dev->name);
+		return 0;
+	}
     return 0;
 }
 
@@ -63,15 +82,49 @@ static bool handle_button_event(const struct button_event *evt)
 	if (evt->pressed) {
 		switch (evt->key_id) {
 		case BTN_INCREASE_PERIOD:
+            if (motor_time_period_msec >= MAX_PERIOD_MSEC)
+            {
+                motor_time_period_msec = MAX_PERIOD_MSEC;
+                LOG_DBG("Max period width reached.");
+                break;
+            }
+            motor_time_period_msec += PERIOD_STEP;
             LOG_DBG("increasing period");
 			break;
-		case BTN_DECREASE_PERIOD:
+		case BTN_DECREASE_PERIOD:        
+            if (motor_time_period_msec <= MIN_PERIOD_MSEC)
+            {
+                motor_time_period_msec = MIN_PERIOD_MSEC;
+                LOG_DBG("Min period width reached.");
+                break;
+            }
+            motor_time_period_msec -= PERIOD_STEP;
             LOG_DBG("Decreasing period");
 			break;
-        case BTN_INCREASE_AMP:
+        case BTN_INCREASE_PW:
+            if (amplitude >= 100)
+            {
+                amplitude = 100;
+                LOG_DBG("Max amplitude reached.");
+                break;
+            }
+            // if (pulse_width >= max_pulse)
+            // {
+            //     pulse_width = max_pulse;
+            //     LOG_DBG("Max pulse width reached.");
+            //     break;
+            // }
+            amplitude += AMPLITUDE_STEP;
             LOG_DBG("Increasing amplitude");
             break;
-        case BTN_DECREASE_AMP:
+        case BTN_DECREASE_PW:
+            if (amplitude <= 0)
+            {
+                amplitude = 0;
+                LOG_DBG("Min amplitude reached.");
+                break;
+            }
+            amplitude -= AMPLITUDE_STEP;
             LOG_DBG("Decreasing Amplitude");
             break;
 		default:
@@ -88,14 +141,14 @@ static bool app_event_handler(const struct app_event_header *aeh)
     {
         struct qdec_module_event *event = cast_qdec_module_event(aeh);
 
-        if (event->type == QDEC_A_EVT_DATA_SEND)
-        {
-            motor_amplitude = calculate_motor_amplitude(event);
-        }
-        if (event->type == QDEC_B_EVT_DATA_SEND)
-        {
-            motor_time_period_msec = calculate_motor_time_period(event);
-        }
+        // if (event->type == QDEC_A_EVT_DATA_SEND)
+        // {
+        //     motor_amplitude = calculate_motor_amplitude(event);
+        // }
+        // if (event->type == QDEC_B_EVT_DATA_SEND)
+        // {
+        //     motor_time_period_msec = calculate_motor_time_period(event);
+        // }
         return false;
     }
 	if (is_button_event(aeh)) {
@@ -133,7 +186,22 @@ static void module_thread_fn(void)
 		LOG_ERR("setup, error: %d", err);
 		// SEND_ERROR(data, DATA_EVT_ERROR, err);
 	}
-
+    int ret;
+    static int up_or_down = 1;
+    
+    while(true)
+    {   
+        uint32_t pulse_width_offset = map_range(amplitude, 0, 100, 0, pulse_range);
+        uint32_t pulse_width = min_pulse+pulse_range+up_or_down*pulse_width_offset;
+        up_or_down *= -1;
+        ret = pwm_set_pulse_dt(&servo, pulse_width);
+		LOG_DBG("Setting servo %d\n", pulse_width);
+		if (ret < 0) {
+			LOG_ERR("Error %d: failed to set pulse width\n", ret);
+			return;
+		}
+        k_sleep(K_MSEC(motor_time_period_msec));
+    }
 	// while (true) {
     //     LOG_DBG("Setting motor (lol)");
 	// 	k_sleep(K_MSEC(motor_time_period_msec));
