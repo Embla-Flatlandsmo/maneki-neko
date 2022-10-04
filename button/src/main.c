@@ -84,11 +84,15 @@ void main(void)
 	}
 
 	printk("Press the button\n");
+	int val = 0;
 	if (led.port) {
 		while (1) {
 			/* If we have an LED, match its state to the button's. */
-			int val = gpio_pin_get_dt(&button);
-			printf("val: %d\n", val);
+			int new_val = gpio_pin_get_dt(&button);
+			if (new_val != val) {
+				printf("old_val: %d, new_val: %d\n", val, new_val);
+				val = new_val;
+			}
 			if (val >= 0) {
 				gpio_pin_set_dt(&led, val);
 			}
