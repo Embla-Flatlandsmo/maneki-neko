@@ -26,4 +26,4 @@ properties:
     required: true
     type: int
     description: |
-      Number of ticks per rotation
+      Number of ticks per rotation (specified in datasheet)

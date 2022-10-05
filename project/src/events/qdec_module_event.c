@@ -34,8 +34,8 @@ static void log_event(const struct app_event_header *aeh)
 	if (event->type == QDEC_EVT_ERROR) {
 		APP_EVENT_MANAGER_LOG(aeh, "%s - Error code %d",
 				get_evt_type_str(event->type), event->data.err);
-	} else if (event->type == QDEC_A_EVT_DATA_SEND
-	|| event->type == QDEC_B_EVT_DATA_SEND) {
+	} else if ((event->type == QDEC_A_EVT_DATA_SEND)
+	|| (event->type == QDEC_B_EVT_DATA_SEND)) {
 		APP_EVENT_MANAGER_LOG(aeh, "%s: %f",
 				get_evt_type_str(event->type), event->data.rot_val);
 	} 
