@@ -117,7 +117,7 @@
 		#size-cells = <1>;
 
 		boot_partition: partition@0 {
-			label = "mcuboot";
+			label = "sam-ba";
 			reg = <0x000000000 0x0000C000>;
 		};
 		slot0_partition: partition@c000 {
