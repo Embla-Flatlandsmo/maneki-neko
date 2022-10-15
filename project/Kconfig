@@ -4,11 +4,6 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-# Asset Tracker v2 requires UART_INTERRUPT_DRIVEN to be enabled when SERIAL is used in order to
-# receive AT Commands.
-config UART_INTERRUPT_DRIVEN
-	default y if SERIAL
-
 # Asset Tracker v2 requires the default logging mode as LOG_MODE_IMMEDIATE because
 # a) LOG_MODE_DEFERRED does not print floating point numbers.
 #	 See : https://github.com/zephyrproject-rtos/zephyr/issues/18351
@@ -17,10 +12,9 @@ choice LOG_MODE
 	default LOG_MODE_IMMEDIATE
 endchoice
 
-menu "Wheelchair Ergometer Game Controller"
+menu "Rotating Platform"
 
 rsource "src/modules/Kconfig.modules_common"
-rsource "src/modules/Kconfig.app_module"
 rsource "src/modules/Kconfig.qdec_module"
 rsource "src/modules/Kconfig.motor_module"
 

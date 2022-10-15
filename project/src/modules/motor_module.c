@@ -35,8 +35,8 @@ static const uint32_t pulse_range = (max_pulse-min_pulse)/2;
 #define BTN_INCREASE_PW 1
 #define BTN_DECREASE_PW 3
 
-#define AMPLITUDE_STEP 10
-#define PERIOD_STEP 100
+#define AMPLITUDE_STEP 1
+#define PERIOD_STEP 10
 
 #define MAX_PERIOD_MSEC 3000
 #define MIN_PERIOD_MSEC 200
@@ -75,6 +75,81 @@ uint8_t calculate_motor_time_period(const struct qdec_module_event *event)
 uint8_t set_motor_time_period(uint8_t time_period_ms)
 {
     return 0;
+}
+
+static void handle_period_event(float value)
+{
+    if (value > 0) 
+    {
+        if (motor_time_period_msec >= MAX_PERIOD_MSEC)
+        {
+            motor_time_period_msec = MAX_PERIOD_MSEC;
+            LOG_DBG("Max period width reached.");
+            return;
+        }
+        motor_time_period_msec += PERIOD_STEP;
+        LOG_DBG("increasing period");
+        return;
+    }
+
+    if (value < 0) 
+    {
+        if (motor_time_period_msec <= MIN_PERIOD_MSEC)
+        {
+            motor_time_period_msec = MIN_PERIOD_MSEC;
+            LOG_DBG("Min period width reached.");
+            return;
+        }
+        motor_time_period_msec -= PERIOD_STEP;
+        LOG_DBG("Decreasing period");
+        return;
+    }
+    return;
+}
+
+static void handle_amplitude_event(float value) 
+{
+    if (value > 0) {
+        if (amplitude >= 100)
+        {
+            amplitude = 100;
+            LOG_DBG("Max amplitude reached.");
+            return;
+        }
+        amplitude += AMPLITUDE_STEP;
+        LOG_DBG("Increasing amplitude");
+        return;
+    }
+
+    if (value < 0) {
+        if (amplitude <= 0)
+        {
+            amplitude = 0;
+            LOG_DBG("Min amplitude reached.");
+            return;
+        }
+        amplitude -= AMPLITUDE_STEP;
+        LOG_DBG("Decreasing Amplitude");
+        return;
+    }
+
+    return;
+}
+
+static bool handle_qdec_module_event(const struct qdec_module_event *evt)
+{
+    switch (evt->type)
+    {
+        case QDEC_A_EVT_DATA_SEND:
+            handle_period_event(evt->data.rot_val);
+            break;
+        case QDEC_B_EVT_DATA_SEND:
+            handle_amplitude_event(evt->data.rot_val);
+            break;
+        default:
+            break;
+    }
+    return false;
 }
 
 static bool handle_button_event(const struct button_event *evt)
@@ -139,7 +214,8 @@ static bool app_event_handler(const struct app_event_header *aeh)
 {
     if (is_qdec_module_event(aeh))
     {
-        struct qdec_module_event *event = cast_qdec_module_event(aeh);
+        return handle_qdec_module_event(cast_qdec_module_event(aeh));
+        // struct qdec_module_event *event = cast_qdec_module_event(aeh);
 
         // if (event->type == QDEC_A_EVT_DATA_SEND)
         // {
@@ -149,7 +225,7 @@ static bool app_event_handler(const struct app_event_header *aeh)
         // {
         //     motor_time_period_msec = calculate_motor_time_period(event);
         // }
-        return false;
+        // return false;
     }
 	if (is_button_event(aeh)) {
 		return handle_button_event(cast_button_event(aeh));
@@ -211,7 +287,7 @@ static void module_thread_fn(void)
 
 K_THREAD_DEFINE(motor_module_thread, CONFIG_MOTOR_THREAD_STACK_SIZE,
 		module_thread_fn, NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
+		K_HIGHEST_APPLICATION_THREAD_PRIO, 0, 0);
 APP_EVENT_LISTENER(MODULE, app_event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, qdec_module_event);
 APP_EVENT_SUBSCRIBE(MODULE, module_state_event);
