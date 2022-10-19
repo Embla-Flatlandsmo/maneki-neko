@@ -14,6 +14,27 @@ config MOTOR_THREAD_STACK_SIZE
 	int "Motor module thread stack size"
 	default 1280
 
+config MOTOR_MODULE_MIN_PERIOD_MSEC
+	int "Minimum period the user may set for oscillations"
+	default 200
+
+config MOTOR_MODULE_MAX_PERIOD_MSEC
+	int "Minimum period the user may set for oscillations"
+	default 3000
+
+config MOTOR_MODULE_AMPLITUDE_STEP
+	int "Number of steps per encoder tick the amplitude increases/decreases by"
+	default 5
+
+config MOTOR_MODULE_PERIOD_STEP
+	int "Number of steps per encoder tick the period increases/decreases by"
+	default 10
+
+config MOTOR_MODULE_USE_BTN_INPUT
+	depends on CAF_BUTTON_EVENTS
+	bool "Use 4 buttons in place of 2 encoders?"
+	default n
+
 
 endif # MOTOR_MODULE
 
