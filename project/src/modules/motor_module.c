@@ -42,7 +42,7 @@ static const uint32_t pulse_range = (max_pulse-min_pulse)/2;
 #define MIN_PERIOD_MSEC 200
 
 // uint32_t pulse_width = min_pulse;
-uint32_t amplitude = 0;
+uint32_t amplitude = 100;
 uint32_t motor_time_period_msec = MIN_PERIOD_MSEC;
 
 uint32_t map_range(uint32_t input, uint32_t input_start, uint32_t input_end, uint32_t output_start, uint32_t output_end)
@@ -227,9 +227,9 @@ static bool app_event_handler(const struct app_event_header *aeh)
         // }
         // return false;
     }
-	if (is_button_event(aeh)) {
-		return handle_button_event(cast_button_event(aeh));
-	}
+	// if (is_button_event(aeh)) {
+	// 	return handle_button_event(cast_button_event(aeh));
+	// }
 
 	if (is_module_state_event(aeh)) {
 		// const struct module_state_event *event = cast_module_state_event(aeh);
@@ -291,5 +291,5 @@ K_THREAD_DEFINE(motor_module_thread, CONFIG_MOTOR_THREAD_STACK_SIZE,
 APP_EVENT_LISTENER(MODULE, app_event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, qdec_module_event);
 APP_EVENT_SUBSCRIBE(MODULE, module_state_event);
-APP_EVENT_SUBSCRIBE(MODULE, button_event);
+// APP_EVENT_SUBSCRIBE(MODULE, button_event);
 // APP_EVENT_SUBSCRIBE(MODULE, click_event);

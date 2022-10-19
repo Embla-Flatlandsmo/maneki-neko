@@ -6,7 +6,7 @@ if QDEC_MODULE
 
 config QDEC_MAX_MESSAGE_FREQUENCY
 	int "Maximum amount of messages allowed to be sent per second"
-	default 80
+	default 200
 
 config QDEC_MINIMUM_DELTA_TIME_MSEC
 	int "Minimum milliseconds required for a encoder update to be valid"
