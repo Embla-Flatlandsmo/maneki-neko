@@ -1,4 +1,6 @@
 # Maneki Neko
+<img src="./img/cat-3-4.png" alt="Maneki Neko model" width="250"/>
+<img src="./img/cat-front.png" alt="Maneki Neko model" width="250"/>
 
 ## Project structure
 | Folder | Description |

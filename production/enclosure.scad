@@ -21,7 +21,7 @@ w=70;
 //inner box length + tolerances
 h=98;
 //inner box depth 
-d=44;
+d=48;
 //wall tickness
 wt=2.4;
 //bottom plate tickness
@@ -69,16 +69,17 @@ chd_v1=w-2*chs_i1-2;
 usb_hole_padding = 2;
 usb_hole_width = 10.6;
 usb_hole_height = 8.5;
-usb_offset_z = 12; // Offset to center of usb hole
+usb_offset_z = 11; // Offset to center of usb hole
 
 
-encoder_hole_padding = 1;
+encoder_hole_padding = 1.5;
 encoder_hole_height = 13.5;
 encoder_hole_width = 12.5;
 encoder_hole_spacing = 24;
 encoder_offset_z = 25; // Offset to center of encoder hole
 
-top_hole_radius = 20;
+top_hole_radius = 18;
+top_mount_hole_radius=2;
 //*************************************************//
 //*************************************************//
 //MODULES
@@ -111,6 +112,7 @@ module box_top()
             
             //subtract here... 
             tph_t_electronics_hole();
+            tph_t_mounting_holes();
             /*************************/ 
         }
 }
@@ -227,23 +229,37 @@ module bh_encoder_hole()
 {
     translate([
     w/2+wt/2, 
-    encoder_hole_spacing/2+encoder_hole_width/2+encoder_hole_padding, 
-    bpt+encoder_offset_z+encoder_hole_padding
+    encoder_hole_spacing/2+encoder_hole_width/2, 
+    bpt+encoder_offset_z
     ])
-        cube([2*wt, encoder_hole_width+encoder_hole_padding, encoder_hole_height+encoder_hole_padding], center=true);
+        cube([2*wt, encoder_hole_width+encoder_hole_padding*2, encoder_hole_height+encoder_hole_padding*2], center=true);
+    //translate([w/2-2*wt,encoder_hole_spacing/2,bpt+encoder_offset_z])
+    //        cube([4*wt, encoder_hole_width, encoder_hole_height]);
 }
 
 module bh_io_usb()
 {
     
-    translate([0, h/2+wt/2, bpt+usb_offset_z+usb_hole_padding])
-        cube([usb_hole_width+usb_hole_padding, 2*wt, bpt+usb_hole_height+usb_hole_padding], center=true);
+    translate([0, h/2+wt/2, bpt+usb_offset_z])
+        cube([usb_hole_width+usb_hole_padding*2, 2*wt, bpt+usb_hole_height+usb_hole_padding*2], center=true);
 }
 
 module tph_t_electronics_hole()
 {
     translate([ 0, 0, d]) 
         cylinder(h=4*tpt, r=top_hole_radius);
+}
+
+module tph_t_mounting_holes()
+{
+    translate([top_hole_radius, top_hole_radius,d])
+        cylinder(h=4*tpt, r=top_mount_hole_radius);
+    translate([-top_hole_radius, top_hole_radius,d])
+        cylinder(h=4*tpt, r=top_mount_hole_radius);
+       translate([top_hole_radius, -top_hole_radius,d])
+        cylinder(h=4*tpt, r=top_mount_hole_radius);
+    translate([-top_hole_radius, -top_hole_radius,d])
+        cylinder(h=4*tpt, r=top_mount_hole_radius);
 }
 
 module tph_t_cut()
