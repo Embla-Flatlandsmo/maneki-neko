@@ -1,6 +1,5 @@
 # Maneki Neko
-<img src="./img/cat-3-4.png" alt="Maneki Neko model" width="250"/>
-<img src="./img/cat-front.png" alt="Maneki Neko model" width="250"/>
+<img src="./img/prototype-front.jpg" alt="Maneki Neko model" height="250"/> <img src="./img/cat-front.png" alt="Maneki Neko model" height="250"/>
 
 ## Project structure
 | Folder | Description |
@@ -10,7 +9,7 @@
 | `schematics` | Images describing the way the electronics are wired |
 
 ## Hardware description
-The project supports using both [nRF52840 DK](https://www.nordicsemi.com/Products/Development-hardware/nrf52840-dk) and [Adafruit ItsyBitsy nRF52840 Express](https://learn.adafruit.com/adafruit-itsybitsy-nrf52840-express).
+The project supports using both [nRF52840 DK](https://www.nordicsemi.com/Products/Development-hardware/nrf52840-dk) and [Adafruit ItsyBitsy nRF52840 Express](https://learn.adafruit.com/adafruit-itsybitsy-nrf52840-express). The enclosure is made for the ItsyBitsy, but `enclosure.scad` has been included so you can make it fit for a different board if you want.
 
 ### nRF 52840 DK
 #### Wiring
@@ -24,6 +23,10 @@ The project supports using both [nRF52840 DK](https://www.nordicsemi.com/Product
 
 
 ### Adafruit ItsyBitsy nRF52840 Express
+A full schematic has been made for the ItsyBitsy nRF52840 Express:
+
+<img src="./schematics/full-system-schematic.png" alt="Full system schematic for ItsyBitsy" width="600"/>
+
 #### Wiring
 | Pin | Name |
 | --- | --- |

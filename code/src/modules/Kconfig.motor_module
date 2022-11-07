@@ -24,7 +24,7 @@ config MOTOR_MODULE_MAX_PERIOD_MSEC
 
 config MOTOR_MODULE_AMPLITUDE_STEP
 	int "Number of steps per encoder tick the amplitude increases/decreases by"
-	default 5
+	default 10
 
 config MOTOR_MODULE_PERIOD_STEP
 	int "Number of steps per encoder tick the period increases/decreases by"
@@ -32,7 +32,7 @@ config MOTOR_MODULE_PERIOD_STEP
 
 config MOTOR_MODULE_USE_BTN_INPUT
 	depends on CAF_BUTTON_EVENTS
-	bool "Use 4 buttons in place of 2 encoders?"
+	bool "Use 4 buttons in place of 2 encoders"
 	default n
 
 

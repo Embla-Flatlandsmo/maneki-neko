@@ -203,7 +203,9 @@ static int setup(void)
 
 static void module_thread_fn(void)
 {
-    LOG_DBG("Initializing motor module");
+    LOG_DBG("Initializing motor module.");
+    LOG_DBG("Pulse width: [%d, %d] (ns)", min_pulse, max_pulse);
+    LOG_DBG("Arm rotation period range: [%d, %d] (ms)", MIN_PERIOD_MSEC, MAX_PERIOD_MSEC);
 	int err;
 
 	err = setup();
