@@ -1,6 +1,8 @@
 # Maneki Neko
 <img src="./img/prototype-front.jpg" alt="Maneki Neko model" height="250"/> <img src="./img/cat-front.png" alt="Maneki Neko model" height="250"/>
 
+The 3D model is made by [Mats N. Olsen](https://www.matsnolsen.com/)
+
 ## Project structure
 | Folder | Description |
 | --- | --- |
