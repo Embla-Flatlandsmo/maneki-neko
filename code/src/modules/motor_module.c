@@ -14,7 +14,7 @@
 #include <device.h>
 #include <drivers/pwm.h>
 
-#include "events/qdec_module_event.h"
+#include "events/encoder_module_event.h"
 #include <caf/events/module_state_event.h>
 
 #define MODULE motor_module
@@ -124,14 +124,14 @@ static void update_amplitude(float value)
 
 /*================= EVENT HANDLERS =================*/
 
-static bool handle_qdec_module_event(const struct qdec_module_event *evt)
+static bool handle_encoder_module_event(const struct encoder_module_event *evt)
 {
     switch (evt->type)
     {
-        case QDEC_A_EVT_DATA_SEND:
+        case ENCODER_A_EVT_DATA_SEND:
             update_period(evt->data.rot_val);
             break;
-        case QDEC_B_EVT_DATA_SEND:
+        case ENCODER_B_EVT_DATA_SEND:
             update_amplitude(evt->data.rot_val);
             break;
         default:
@@ -168,9 +168,9 @@ static bool handle_button_event(const struct button_event *evt)
 
 static bool app_event_handler(const struct app_event_header *aeh)
 {
-    if (is_qdec_module_event(aeh))
+    if (is_encoder_module_event(aeh))
     {
-        return handle_qdec_module_event(cast_qdec_module_event(aeh));
+        return handle_encoder_module_event(cast_encoder_module_event(aeh));
     }
 
 #if IS_ENABLED(CONFIG_MOTOR_MODULE_USE_BTN_INPUT)
@@ -234,7 +234,7 @@ K_THREAD_DEFINE(motor_module_thread, CONFIG_MOTOR_THREAD_STACK_SIZE,
 		module_thread_fn, NULL, NULL, NULL,
 		K_HIGHEST_APPLICATION_THREAD_PRIO, 0, 0);
 APP_EVENT_LISTENER(MODULE, app_event_handler);
-APP_EVENT_SUBSCRIBE(MODULE, qdec_module_event);
+APP_EVENT_SUBSCRIBE(MODULE, encoder_module_event);
 APP_EVENT_SUBSCRIBE(MODULE, module_state_event);
 
 #if IS_ENABLED(CONFIG_MOTOR_MODULE_USE_BTN_INPUT)

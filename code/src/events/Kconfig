@@ -10,12 +10,8 @@ menuconfig EVENTS
 
 if EVENTS
 
-# config APP_EVENTS_LOG
-# 	bool "Enable logging for application module events"
-# 	default y
-
-config QDEC_EVENTS_LOG
-	bool "Enable logging for BLE module events"
+config ENCODER_EVENTS_LOG
+	bool "Enable logging for encoder module events"
 	default y
 
 if NRF_PROFILER

@@ -24,7 +24,7 @@ config MOTOR_MODULE_MAX_PERIOD_MSEC
 
 config MOTOR_MODULE_AMPLITUDE_STEP
 	int "Number of steps per encoder tick the amplitude increases/decreases by"
-	default 10
+	default 5
 
 config MOTOR_MODULE_PERIOD_STEP
 	int "Number of steps per encoder tick the period increases/decreases by"

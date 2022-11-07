@@ -15,7 +15,7 @@ endchoice
 menu "Rotating Platform"
 
 rsource "src/modules/Kconfig.modules_common"
-rsource "src/modules/Kconfig.qdec_module"
+rsource "src/modules/Kconfig.encoder_module"
 rsource "src/modules/Kconfig.motor_module"
 
 rsource "src/events/Kconfig"
